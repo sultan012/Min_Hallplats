@@ -6,6 +6,7 @@
   <title>Min Hållplats</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <link rel="icon" type="image/png" href="./images/sl_logo.png"/>
+    <link href="https://fonts.googleapis.com/css?family=Acme" rel="stylesheet">
 
 </head>
 
@@ -85,40 +86,44 @@
               stationIdReading = false;
           }
       }
+
       //return station number/id
       function getStationNumber() {
           return stationNumber;
         }
-
-        function setStationName(sName) {
+      // Save Station Name
+      function setStationName(sName) {
           stationName = sName;
           console.log('setStationNumber fun id is :' + stationNumber);
       }
 
+      //return station Name
       function getStationName() {
           return stationName;
-
       }
 
-      function  clear() {
+      // Clear Interval 'Update data'
+      function clear() {
           clearInterval (myVar);
       }
 
+      // get Station number or name values from html and save it i variable ANA run displayData function
       function setData() {
           setStationNumber(document.getElementById('stationNumber').value);
           setStationName(document.getElementById('stationName').value);
           displayData()
       }
-
+      /* check which value is input
+      if station id input so run updateData function
+      if station name input so get station id by getStationId();
+      * */
       function displayData() {
             stationName = getStationName();
             stationNumber = getStationNumber();
 
-
           console.log("stationNumber is: " + stationNumber + "   stationName is : " + stationName);
-
+          // error handling at entry data
           if ((stationNumber =="" && stationName =="") || (stationNumber !=="" && stationName !=="") ){
-             // document.getElementById('demoError').innerHTML="Vänligt fylla stationsnummer eller stationsnamn :) ";
               window.alert("Vänligt fylla stationsnummer eller stationsnamn :) ");
           } else if (stationNumber !==""){
               clear();
@@ -129,19 +134,18 @@
               getStationId();
               console.log("station Name NOT empty");
           }
-
           console.log("out of if condition");
-         // updateData(stationNumber);
-
-
 
       }
+
+      // update display data every 60 seconds
         function updateData() {
           console.log("updateData: " + stationNumber);
           getData();
-          myVar = setInterval(getData, (23*1000));
+          myVar = setInterval(getData, (60*1000));
         }
 
+      // getting station ID by SL API
       function getStationId() {
           const url = 'https://cors-anywhere.herokuapp.com/http://api.sl.se/api2/typeahead.json?key=530e6948e2c540c3a48bc331e925db45&searchstring='+ stationName + '&stationsonly=true&maxresults=1';
           fetch(url)
@@ -155,13 +159,11 @@
                   var id  = departure.SiteId;
                   console.log("getStationId Function: " + id);
                   setStationNumber(id);
-
               })
           })
               .catch(function (error) {
                   console.log(error);
               });
-
       }
 
 
@@ -173,15 +175,13 @@
       return parent.appendChild(el);
     }
 
-
-    
+    // getting all data by SL API
    function getData() {
        stationNumber = getStationNumber();
         console.log("In getData Function:" + stationNumber );
-     // var  stationNumber=id;
+
        document.getElementById("departures").innerHTML="";                           //Clear Window
 
-     //  var stationNumber = document.getElementById('stationNumber').value;
        var timewindow = document.getElementById('timewindow').value;
        var walkingTime = document.getElementById('walkingTime').value;
 
