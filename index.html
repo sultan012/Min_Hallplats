@@ -5,6 +5,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>Min Hållplats</title>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="icon" type="image/png" href="./images/sl_logo.png"/>
 
 </head>
 
@@ -15,49 +16,49 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-25">
+        <div class="col-40">
              <p>Hållplats nummer:</p>
         </div>
 
-        <div class="col-75">
+        <div class="col-40">
             <input type="number" id="stationNumber" value="" >
         </div>
     </div>
 
     <div class="row">
-        <div class="col-25">
+        <div class="col-40">
             <p>Hållplats Namn:</p>
         </div>
 
-        <div class="col-75">
+        <div class="col-40">
             <input type="text" id="stationName" value=""  >
         </div>
     </div>
 
     <div class="row">
-        <div class="col-25">
+        <div class="col-40">
             <p>Tid / min</p>
         </div>
 
-        <div class="col-75">
-            <input class="col-75" type="number" id="timewindow" value="5" >
+        <div class="col-40">
+            <input class="col-40" type="number" id="timewindow" value="5" >
         </div>
 
     </div>
 
    <div class="row">
-    <div class="col-25">
+    <div class="col-40">
         <p>Gångtid / Min</p>
     </div>
 
-    <div class="col-75">
-        <input class="col-75" type="number" id="walkingTime" value="3" >
+    <div class="col-40">
+        <input class="col-40" type="number" id="walkingTime" value="3" >
     </div>
 
 </div>
 
     <div class="row">
-          <button type="button" onclick="displayData()">Visa!</button>
+          <button type="button" onclick="setData()">Visa!</button>
     </div>
 
 </div>
@@ -70,39 +71,54 @@
 
   <script language="javascript">
 
-      var stationNumber='';
-      var stationName = '';
-      var   myVar;
+      var stationNumber='';                      //global variable for station number/id
+      var stationName = '';                      //global variable for station name
+      var   myVar;                               //global variable for Interval/ update data
+      var stationIdReading = false;               //global variable for true station number/id getting av getStationId()
 
+      //save station number/id in variable
       function setStationNumber(sNumber) {
           stationNumber = sNumber;
           console.log('setStationNumber function id is :' + stationNumber);
-          //updateData();
+          if (stationIdReading){
+              updateData();
+              stationIdReading = false;
+          }
       }
-        function getStationNumber() {
+      //return station number/id
+      function getStationNumber() {
           return stationNumber;
         }
-      function setStationName(sName) {
+
+        function setStationName(sName) {
           stationName = sName;
           console.log('setStationNumber fun id is :' + stationNumber);
-          //updateData();
+      }
+
+      function getStationName() {
+          return stationName;
+
       }
 
       function  clear() {
           clearInterval (myVar);
       }
-      function myFunction() {
 
-
+      function setData() {
+          setStationNumber(document.getElementById('stationNumber').value);
+          setStationName(document.getElementById('stationName').value);
+          displayData()
       }
 
       function displayData() {
+            stationName = getStationName();
+            stationNumber = getStationNumber();
 
-          setStationNumber(document.getElementById('stationNumber').value);
-          setStationName(document.getElementById('stationName').value);
 
           console.log("stationNumber is: " + stationNumber + "   stationName is : " + stationName);
+
           if ((stationNumber =="" && stationName =="") || (stationNumber !=="" && stationName !=="") ){
+             // document.getElementById('demoError').innerHTML="Vänligt fylla stationsnummer eller stationsnamn :) ";
               window.alert("Vänligt fylla stationsnummer eller stationsnamn :) ");
           } else if (stationNumber !==""){
               clear();
@@ -121,16 +137,12 @@
 
       }
         function updateData() {
-
           console.log("updateData: " + stationNumber);
-            getData();
-               myVar = setInterval(getData, (23*1000));
-
+          getData();
+          myVar = setInterval(getData, (23*1000));
         }
 
       function getStationId() {
-
-          const ul = document.getElementById('departures');
           const url = 'https://cors-anywhere.herokuapp.com/http://api.sl.se/api2/typeahead.json?key=530e6948e2c540c3a48bc331e925db45&searchstring='+ stationName + '&stationsonly=true&maxresults=1';
           fetch(url)
               .then((resp) => resp.json())
@@ -139,15 +151,11 @@
               console.log(departures);
               return departures.map(function (departure) {
 
-                  let li = createNode('li'),
-                      span = createNode('span');
+                  stationIdReading = true;
                   var id  = departure.SiteId;
-                  console.log("id: " + id);
+                  console.log("getStationId Function: " + id);
                   setStationNumber(id);
 
-                //  span.innerHTML = departure.Name + " : "+ departure.SiteId ;
-                  append(li, span);
-                  append(ul, li);
               })
           })
               .catch(function (error) {
@@ -189,7 +197,19 @@
         return departures.map(function (departure) {
           let li = createNode('li'),
                   span = createNode('span');
-                    span.setAttribute("class","line");
+                  var groupOfLine= departure.GroupOfLine;
+
+                  if(groupOfLine.includes("gröna linje")){
+                        groupOfLine = "T-bana";
+                        span.setAttribute("class","green");
+            }else if(groupOfLine.includes("röda linje")){
+                      groupOfLine = "T-bana";
+                        span.setAttribute("class","red");
+                    }else if (groupOfLine.includes("blå linje")) {
+                      groupOfLine = "T-bana";
+                        span.setAttribute("class", "blue");
+                    }else
+                        span.setAttribute("class","line");
 
                   timeSpan =createNode('span');
                      timeSpan.setAttribute("class","time");
@@ -198,7 +218,7 @@
                     lineNumberSpan.setAttribute("class","stationNumber");
 
                   destinationSpan =createNode('span');
-                    destinationSpan.setAttribute("class","destinationNamn");
+                    destinationSpan.setAttribute("class","destinationName");
 
             h3.innerHTML = departure.StopAreaName;
 
@@ -206,7 +226,7 @@
 
             destinationSpan.innerHTML = departure.Destination;
 
-            var displayTime =  departure.DisplayTime
+            var displayTime =  departure.DisplayTime;
                 if(displayTime == "Nu"){
                 displayTime= "0 min";
                 }
@@ -215,12 +235,8 @@
 
             if(newDisplayTime > 0)
             {
-
-            span.innerHTML = departure.GroupOfLine;
-                  //`${departure.GroupOfLine + ":" + departure.DisplayTime}`;
+                span.innerHTML = groupOfLine;
                 timeSpan.innerHTML = newDisplayTime + " min";
-
-
 
           append(li,lineNumberSpan);
           append(li, span);
