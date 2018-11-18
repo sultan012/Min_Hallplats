@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Min Hållplats</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+</head>
+
+<body>
+<div class="header">
+    <a>Min Hållplats</a>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-25">
+             <p>Hållplats nummer:</p>
+        </div>
+
+        <div class="col-75">
+            <input type="number" id="stationNumber" value="" >
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-25">
+            <p>Hållplats Namn:</p>
+        </div>
+
+        <div class="col-75">
+            <input type="text" id="stationName" value=""  >
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-25">
+            <p>Tid / min</p>
+        </div>
+
+        <div class="col-75">
+            <input class="col-75" type="number" id="timewindow" value="5" >
+        </div>
+
+    </div>
+
+   <div class="row">
+    <div class="col-25">
+        <p>Gångtid / Min</p>
+    </div>
+
+    <div class="col-75">
+        <input class="col-75" type="number" id="walkingTime" value="3" >
+    </div>
+
+</div>
+
+    <div class="row">
+          <button type="button" onclick="displayData()">Visa!</button>
+    </div>
+
+</div>
+
+<div class="container">
+    <h3 id="StopAreaName"></h3>
+    <ul id="departures"></ul>
+</div>
+
+
+  <script language="javascript">
+
+      var stationNumber='';
+      var stationName = '';
+      var   myVar;
+
+      function setStationNumber(sNumber) {
+          stationNumber = sNumber;
+          console.log('setStationNumber function id is :' + stationNumber);
+          //updateData();
+      }
+        function getStationNumber() {
+          return stationNumber;
+        }
+      function setStationName(sName) {
+          stationName = sName;
+          console.log('setStationNumber fun id is :' + stationNumber);
+          //updateData();
+      }
+
+      function  clear() {
+          clearInterval (myVar);
+      }
+      function myFunction() {
+
+
+      }
+
+      function displayData() {
+
+          setStationNumber(document.getElementById('stationNumber').value);
+          setStationName(document.getElementById('stationName').value);
+
+          console.log("stationNumber is: " + stationNumber + "   stationName is : " + stationName);
+          if ((stationNumber =="" && stationName =="") || (stationNumber !=="" && stationName !=="") ){
+              window.alert("Vänligt fylla stationsnummer eller stationsnamn :) ");
+          } else if (stationNumber !==""){
+              clear();
+              updateData();
+              console.log("stationNumber NOT empty");
+          } else {
+              clear();
+              getStationId();
+              console.log("station Name NOT empty");
+          }
+
+          console.log("out of if condition");
+         // updateData(stationNumber);
+
+
+
+      }
+        function updateData() {
+
+          console.log("updateData: " + stationNumber);
+            getData();
+               myVar = setInterval(getData, (23*1000));
+
+        }
+
+      function getStationId() {
+
+          const ul = document.getElementById('departures');
+          const url = 'https://cors-anywhere.herokuapp.com/http://api.sl.se/api2/typeahead.json?key=530e6948e2c540c3a48bc331e925db45&searchstring='+ stationName + '&stationsonly=true&maxresults=1';
+          fetch(url)
+              .then((resp) => resp.json())
+      .then(function (data) {
+              let departures = data.ResponseData;
+              console.log(departures);
+              return departures.map(function (departure) {
+
+                  let li = createNode('li'),
+                      span = createNode('span');
+                  var id  = departure.SiteId;
+                  console.log("id: " + id);
+                  setStationNumber(id);
+
+                //  span.innerHTML = departure.Name + " : "+ departure.SiteId ;
+                  append(li, span);
+                  append(ul, li);
+              })
+          })
+              .catch(function (error) {
+                  console.log(error);
+              });
+
+      }
+
+
+      function createNode(element) {
+      return document.createElement(element);
+    }
+
+    function append(parent, el) {
+      return parent.appendChild(el);
+    }
+
+
+    
+   function getData() {
+       stationNumber = getStationNumber();
+        console.log("In getData Function:" + stationNumber );
+     // var  stationNumber=id;
+       document.getElementById("departures").innerHTML="";                           //Clear Window
+
+     //  var stationNumber = document.getElementById('stationNumber').value;
+       var timewindow = document.getElementById('timewindow').value;
+       var walkingTime = document.getElementById('walkingTime').value;
+
+       console.log("stationNumber: "+stationNumber);
+       const h3 = document.getElementById('StopAreaName');
+       const ul = document.getElementById('departures');
+       const url = 'https://cors-anywhere.herokuapp.com/http://api.sl.se/api2/realtimedeparturesV4.json?key=98a2288381294bc4bb3a075a7fc9b8bd&siteid=' + stationNumber + '&timewindow='+timewindow;
+
+     fetch(url)
+              .then((resp) => resp.json())
+              .then(function(data) {
+        let departures = data.ResponseData.Metros;
+        return departures.map(function (departure) {
+          let li = createNode('li'),
+                  span = createNode('span');
+                    span.setAttribute("class","line");
+
+                  timeSpan =createNode('span');
+                     timeSpan.setAttribute("class","time");
+
+                  lineNumberSpan =createNode('span');
+                    lineNumberSpan.setAttribute("class","stationNumber");
+
+                  destinationSpan =createNode('span');
+                    destinationSpan.setAttribute("class","destinationNamn");
+
+            h3.innerHTML = departure.StopAreaName;
+
+            lineNumberSpan.innerHTML = departure.LineNumber;
+
+            destinationSpan.innerHTML = departure.Destination;
+
+            var displayTime =  departure.DisplayTime
+                if(displayTime == "Nu"){
+                displayTime= "0 min";
+                }
+                 displayTime= displayTime.replace(" min","");
+            var  newDisplayTime = displayTime - walkingTime;
+
+            if(newDisplayTime > 0)
+            {
+
+            span.innerHTML = departure.GroupOfLine;
+                  //`${departure.GroupOfLine + ":" + departure.DisplayTime}`;
+                timeSpan.innerHTML = newDisplayTime + " min";
+
+
+
+          append(li,lineNumberSpan);
+          append(li, span);
+          append(li, timeSpan);
+          append(li, destinationSpan);
+          append(ul, li);
+            }
+
+        })
+      })
+              .catch(function (error) {
+                console.log(error);
+              });
+   }
+
+
+  </script>
+
+<div class="footer">
+    <p> &#169 Copyright Min Hållplats 2018</p>
+</div>
+</body>
