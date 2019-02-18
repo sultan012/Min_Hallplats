@@ -1,28 +1,28 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <title>Min Hållplats</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <link rel="icon" type="image/png" href="./images/sl_logo.png"/>
-    <link href="https://fonts.googleapis.com/css?family=Acme" rel="stylesheet">
+	<head>
+	  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	  <title>Min Hållplats</title>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<link rel="icon" type="image/png" href="./images/sl_logo.png"/>
+		<link href="https://fonts.googleapis.com/css?family=Acme" rel="stylesheet">
 
-</head>
+	</head>
 
-<body>
-<div class="header">
-    <a>Min Hållplats</a>
-</div>
+	<body>
+		<div class="header">
+			<a>Min Hållplats</a>
+		</div>
 
-<div class="container">
+	<div class="container">
     <div class="row">
         <div class="col-40">
              <p>Hållplats nummer:</p>
         </div>
 
         <div class="col-40">
-            <input type="number" id="stationNumber" value="" >
+            <input type="number" id="stationNumber" value="" placeholder="Ex. 9305" >
         </div>
     </div>
 
@@ -32,7 +32,7 @@
         </div>
 
         <div class="col-40">
-            <input type="text" id="stationName" value=""  >
+            <input type="text" id="stationName" value="" placeholder="Ex. Solna" >
         </div>
     </div>
 
@@ -42,7 +42,7 @@
         </div>
 
         <div class="col-40">
-            <input class="col-40" type="number" id="timewindow" value="5" >
+            <input class="col-40" type="number" id="timewindow" value="30" >
         </div>
 
     </div>
@@ -104,7 +104,7 @@
 
       // Clear Interval 'Update data'
       function clear() {
-          clearInterval (myVar);
+          //clearInterval (myVar);
       }
 
       // get Station number or name values from html and save it i variable ANA run displayData function
@@ -253,9 +253,10 @@
    }
 
 
-  </script>
+	</script>
 
 <!-- <div class="footer">
     <p> &#169 Copyright Min Hållplats 2018</p>
 </div> -->
-</body>
+	</body>
+</html>
